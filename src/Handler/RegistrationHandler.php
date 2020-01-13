@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Enum\Roles;
 use App\Event\Events;
 use App\Event\UserEvent;
+use App\Factory\UserFactory;
 use App\Form\Model\Registration;
 use App\Guesser\DomainGuesser;
 use App\Helper\PasswordUpdater;
@@ -117,19 +118,9 @@ class RegistrationHandler
         return true;
     }
 
-    /**
-     * @return User
-     *
-     * @throws \Exception
-     */
-    private function buildUser(Registration $registration)
+    private function buildUser(Registration $registration): User
     {
-        $user = new User();
-        $user->setEmail(strtolower($registration->getEmail()));
-        $user->setPlainPassword($registration->getPlainPassword());
-        $user->setRoles([Roles::USER]);
-        $user->setCreationTime(new \DateTime());
-        $user->setUpdatedTime(new \DateTime());
+        $user = UserFactory::fromRegistration($registration);
 
         if (null !== $domain = $this->domainGuesser->guess($registration->getEmail())) {
             $user->setDomain($domain);
